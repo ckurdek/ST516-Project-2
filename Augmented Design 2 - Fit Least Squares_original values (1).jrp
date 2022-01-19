@@ -1,0 +1,435 @@
+﻿New Table( "Augmented Design 2",
+	Add Rows( 32 ),
+	New Table Variable( "Design", "Augmented Design" ),
+	New Script(
+		"Model",
+		Fit Model(
+			Effects(
+				:Fiber draw speed, :Furnace temperature, :Draw tension,
+				:Germanium Concentration, :Fiber design, :Draw tower,
+				:Raw material supplier, :Coating type,
+				:Fiber draw speed * :Draw tension,
+				:Fiber draw speed * :Germanium Concentration,
+				:Fiber draw speed * :Fiber design, :Fiber draw speed * :Draw tower,
+				:Fiber draw speed * :Raw material supplier,
+				:Fiber draw speed * :Coating type
+			),
+			Y( :Signal attenuation )
+		)
+	),
+	New Script(
+		"Evaluate Design",
+		DOE(
+			Evaluate Design,
+			X(
+				:Fiber draw speed, :Furnace temperature, :Draw tension,
+				:Germanium Concentration, :Fiber design, :Draw tower,
+				:Raw material supplier, :Coating type
+			)
+		)
+	),
+	New Script(
+		"Original Data Table",
+		New Table( "Fractional Factorial",
+			Add Rows( 16 ),
+			New Table Variable( "Design", "Fractional Factorial" ),
+			New Script(
+				"Screening",
+				Fit Two Level Screening(
+					Y( :Signal attenuation ),
+					X(
+						:Block, :Fiber draw speed, :Furnace temperature,
+						:Draw tension, :Germanium Concentration, :Fiber design,
+						:Draw tower, :Raw material supplier, :Coating type
+					)
+				)
+			),
+			New Script(
+				"Model",
+				Fit Model(
+					Effects(
+						:Fiber draw speed, :Furnace temperature, :Draw tension,
+						:Germanium Concentration, :Fiber design, :Draw tower,
+						:Raw material supplier, :Coating type, :Block,
+						:Fiber draw speed * :Draw tension,
+						:Fiber draw speed * :Germanium Concentration,
+						:Fiber draw speed * :Fiber design,
+						:Fiber draw speed * :Draw tower,
+						:Fiber draw speed * :Raw material supplier,
+						:Fiber draw speed * :Coating type
+					),
+					Y( :Signal attenuation ),
+					PERSONALITY( Standard Least Squares )
+				)
+			),
+			New Script(
+				"Evaluate Design",
+				DOE(
+					Evaluate Design,
+					X(
+						:Block, :Fiber draw speed, :Furnace temperature,
+						:Draw tension, :Germanium Concentration, :Fiber design,
+						:Draw tower, :Raw material supplier, :Coating type
+					)
+				)
+			),
+			New Script(
+				"DOE Dialog",
+				DOE(
+					Screening Design,
+					{Add Response( Minimize, "Signal attenuation", ., ., . ),
+					Add Factor( Continuous, 20, 30, "Fiber draw speed", 0 ),
+					Add Factor( Continuous, 1800, 2200, "Furnace temperature", 0 ),
+					Add Factor( Continuous, 0.5, 1, "Draw tension", 0 ),
+					Add Factor(
+						Continuous, 0.01, 0.05, "Germanium Concentration", 0
+					), Add Factor( Categorical, {"1", "2"}, "Fiber design", 0 ),
+					Add Factor( Categorical, {"1", "2"}, "Draw tower", 0 ),
+					Add Factor(
+						Categorical,
+						{"1", "2"},
+						"Raw material supplier",
+						0
+					), Add Factor( Categorical, {"1", "2"}, "Coating type", 0 ),
+					Set Random Seed( 585261347 ), Make Design( 3 ),
+					Set Generators(
+						[0 1 1 1 1,
+						1 0 1 1 1,
+						1 1 1 0 0,
+						1 1 0 1 0,
+						1 1 1 1 2,
+						0 0 0 0 0]
+					), Simulate Responses( 0 ), Save X Matrix( 0 )}
+				)
+			),
+			New Column( "Pattern",
+				Character,
+				"Nominal",
+				Set Values(
+					{"+−++−+−−", "−++++−−−", "−++−−+−+", "+−−−−+++", "−+−−+−++",
+					"+−−++−+−", "−+−+−++−", "+−+−+−−+", "−−−+++−+", "−−+−+++−",
+					"−−−−−−−−", "++++++++", "+++−−−+−", "++−+−−−+", "−−++−−++",
+					"++−−++−−"}
+				)
+			),
+			New Column( "Block",
+				Character,
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+				Set Property( "RunsPerBlock", 8 ),
+				Set Property( "Design Role", DesignRole( Blocking ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "2", "2", "2",
+					"2", "2", "2"}
+				)
+			),
+			New Column( "Fiber draw speed",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {20, 30} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[30, 20, 20, 30, 20, 30, 20, 30, 20, 20, 20, 30, 30, 30, 20, 30]
+				)
+			),
+			New Column( "Furnace temperature",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {1800, 2200} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[1800, 2200, 2200, 1800, 2200, 1800, 2200, 1800, 1800, 1800,
+					1800, 2200, 2200, 2200, 1800, 2200]
+				)
+			),
+			New Column( "Draw tension",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {0.5, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[1, 1, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 1, 1, 0.5, 1, 0.5]
+				)
+			),
+			New Column( "Germanium Concentration",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {0.01, 0.05} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[0.05, 0.05, 0.01, 0.01, 0.01, 0.05, 0.05, 0.01, 0.05, 0.01,
+					0.01, 0.05, 0.01, 0.05, 0.05, 0.01]
+				)
+			),
+			New Column( "Fiber design",
+				Character,
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"1", "2", "1", "1", "2", "2", "1", "2", "2", "2", "1", "2", "1",
+					"1", "1", "2"}
+				)
+			),
+			New Column( "Draw tower",
+				Character,
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"2", "1", "2", "2", "1", "1", "2", "1", "2", "2", "1", "2", "1",
+					"1", "1", "2"}
+				)
+			),
+			New Column( "Raw material supplier",
+				Character,
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"1", "1", "1", "2", "2", "2", "2", "1", "1", "2", "1", "2", "2",
+					"1", "2", "1"}
+				)
+			),
+			New Column( "Coating type",
+				Character,
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"1", "1", "2", "2", "2", "1", "1", "2", "2", "1", "1", "2", "1",
+					"2", "2", "1"}
+				)
+			),
+			New Column( "Signal attenuation",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property(
+					"Response Limits",
+					{Goal( Minimize ), Lower( . ), Upper( . ), Importance( . )}
+				),
+				Set Selected,
+				Set Values(
+					[0.334549669, 0.349788234, 0.672664588, 0.302839027, 0.297806029,
+					0.524011058, 0.553408626, 0.628774793, 0.435847596, 0.398968237,
+					0.342521204, 0.61994277, 0.439729688, 0.475513141, 0.629108535,
+					0.407884247]
+				)
+			),
+			Set Row States( [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ),
+			Set Label Columns( :Pattern )
+		)
+	),
+	New Script(
+		"DOE Dialog",
+		dt = Current Data Table();
+		dt2 = dt << run script( "Original Data Table" );
+		Current Data Table( dt2 );
+		DOE(
+			Augment Design,
+			X(
+				:Fiber draw speed, :Furnace temperature, :Draw tension,
+				:Germanium Concentration, :Fiber design, :Draw tower,
+				:Raw material supplier, :Coating type
+			),
+			Y( :Signal attenuation ),
+			{Augment Method( Fold Over, [3] ), Save X Matrix( 0 ),
+			Simulate Responses( 0 ), Make Table}
+		);
+	),
+	New Column( "Fiber draw speed",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {20, 30} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[30, 20, 20, 30, 20, 30, 20, 30, 20, 20, 20, 30, 30, 30, 20, 30, 30, 20,
+			20, 30, 20, 30, 20, 30, 20, 20, 20, 30, 30, 30, 20, 30]
+		)
+	),
+	New Column( "Furnace temperature",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {1800, 2200} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[1800, 2200, 2200, 1800, 2200, 1800, 2200, 1800, 1800, 1800, 1800, 2200,
+			2200, 2200, 1800, 2200, 1800, 2200, 2200, 1800, 2200, 1800, 2200, 1800,
+			1800, 1800, 1800, 2200, 2200, 2200, 1800, 2200]
+		)
+	),
+	New Column( "Draw tension",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {0.5, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[1, 1, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 1, 1, 0.5, 1, 0.5, 0.5,
+			0.5, 0.5, 1, 1, 1, 1, 0.5, 1, 0.5, 1, 0.5, 0.5, 1, 0.5, 1]
+		)
+	),
+	New Column( "Germanium Concentration",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {0.01, 0.05} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[0.05, 0.05, 0.01, 0.01, 0.01, 0.05, 0.05, 0.01, 0.05, 0.01, 0.01, 0.05,
+			0.01, 0.05, 0.05, 0.01, 0.05, 0.05, 0.01, 0.01, 0.01, 0.05, 0.05, 0.01,
+			0.05, 0.01, 0.01, 0.05, 0.01, 0.05, 0.05, 0.01]
+		)
+	),
+	New Column( "Fiber design",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"1", "2", "1", "1", "2", "2", "1", "2", "2", "2", "1", "2", "1", "1",
+			"1", "2", "1", "2", "1", "1", "2", "2", "1", "2", "2", "2", "1", "2",
+			"1", "1", "1", "2"}
+		)
+	),
+	New Column( "Draw tower",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"2", "1", "2", "2", "1", "1", "2", "1", "2", "2", "1", "2", "1", "1",
+			"1", "2", "2", "1", "2", "2", "1", "1", "2", "1", "2", "2", "1", "2",
+			"1", "1", "1", "2"}
+		)
+	),
+	New Column( "Raw material supplier",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"1", "1", "1", "2", "2", "2", "2", "1", "1", "2", "1", "2", "2", "1",
+			"2", "1", "1", "1", "1", "2", "2", "2", "2", "1", "1", "2", "1", "2",
+			"2", "1", "2", "1"}
+		)
+	),
+	New Column( "Coating type",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"1", "1", "2", "2", "2", "1", "1", "2", "2", "1", "1", "2", "1", "2",
+			"2", "1", "1", "1", "2", "2", "2", "1", "1", "2", "2", "1", "1", "2",
+			"1", "2", "2", "1"}
+		)
+	),
+	New Column( "Signal attenuation",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property(
+			"Response Limits",
+			{Goal( Minimize ), Lower( . ), Upper( . ), Importance( . )}
+		),
+		Set Selected,
+		Set Values(
+			[0.334549669, 0.349788234, 0.672664588, 0.302839027, 0.297806029,
+			0.524011058, 0.553408626, 0.628774793, 0.435847596, 0.398968237,
+			0.342521204, 0.61994277, 0.439729688, 0.475513141, 0.629108535,
+			0.407884247, 0.496108492, 0.464536093, 0.308140395, 0.645523446,
+			0.712234594, 0.368390687, 0.314885888, 0.262739027, 0.622424424,
+			0.293355368, 0.360224582, 0.43121089, 0.365523229, 0.582315154,
+			0.356821339, 0.366588031]
+		)
+	),
+	Set Row States(
+		[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1]
+	)
+) << Run Formulas;
+Fit Model(
+	Y( :Signal attenuation ),
+	Effects(
+		:Fiber draw speed, :Draw tension, :Germanium Concentration, :Fiber design,
+		:Draw tower, :Coating type, :Fiber draw speed * :Draw tension,
+		:Fiber draw speed * :Germanium Concentration,
+		:Fiber draw speed * :Fiber design, :Fiber draw speed * :Draw tower,
+		:Fiber draw speed * :Coating type, :Draw tension * :Germanium Concentration,
+		:Draw tension * :Fiber design, :Draw tension * :Draw tower,
+		:Draw tension * :Coating type, :Germanium Concentration * :Fiber design,
+		:Germanium Concentration * :Draw tower,
+		:Germanium Concentration * :Coating type, :Fiber design * :Draw tower,
+		:Fiber design * :Coating type, :Draw tower * :Coating type
+	),
+	Personality( "Standard Least Squares" ),
+	Emphasis( "Effect Screening" ),
+	Run(
+		Profiler(
+			1,
+			Confidence Intervals( 1 ),
+			Desirability Functions( 1 ),
+			Term Value(
+				Fiber draw speed( 25, Lock( 0 ), Show( 1 ) ),
+				Draw tension( 0.75, Lock( 0 ), Show( 1 ) ),
+				Germanium Concentration( 0.03, Min( 0.01 ), Lock( 0 ), Show( 1 ) ),
+				Fiber design( "1", Lock( 0 ), Show( 1 ) ),
+				Draw tower( "1", Lock( 0 ), Show( 1 ) ),
+				Coating type( "1", Lock( 0 ), Show( 1 ) )
+			)
+		),
+		:Signal attenuation << {Summary of Fit( 0 ), Analysis of Variance( 0 ),
+		Parameter Estimates( 1 ), Lack of Fit( 0 ),
+		Normal Plot( 1, Half Normal Plot( 1 ) ), Sorted Estimates( 0 ),
+		Plot Actual by Predicted( 1 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 1 ), Plot Studentized Residuals( 1 ),
+		Plot Effect Leverage( 0 ), Plot Residual by Normal Quantiles( 0 ),
+		Box Cox Y Transformation( 0 )}
+	),
+	SendToReport(
+		Dispatch(
+			{"Response Signal attenuation", "Effect Screening"},
+			"Parameter Estimate Population",
+			OutlineBox,
+			{Close( 0 )}
+		),
+		Dispatch(
+			{"Response Signal attenuation", "Effect Screening", "Normal Plot"},
+			"1",
+			ScaleBox,
+			{Format( "Fixed Dec", 12, 1 ), Min( 0 ), Max( 3 ), Inc( 0.5 ),
+			Minor Ticks( 0 )}
+		),
+		Dispatch(
+			{"Response Signal attenuation", "Effect Screening", "Normal Plot"},
+			"2",
+			ScaleBox,
+			{Min( 0 ), Max( 0.09 ), Inc( 0.02 ), Minor Ticks( 1 )}
+		)
+	)
+);

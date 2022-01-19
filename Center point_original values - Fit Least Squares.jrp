@@ -1,0 +1,203 @@
+﻿New Table( "Center point_original values",
+	Add Rows( 18 ),
+	New Table Variable( "Design", "Augmented Design" ),
+	New Script(
+		"Model",
+		Fit Model(
+			Effects(
+				:Draw tension, :Germanium Concentration, :Coating type,
+				:Draw tension * :Germanium Concentration,
+				:Draw tension * :Coating type,
+				:Germanium Concentration * :Coating type
+			),
+			Y( :Signal attenuation )
+		)
+	),
+	New Script(
+		"Evaluate Design",
+		DOE(
+			Evaluate Design,
+			X( :Draw tension, :Germanium Concentration, :Coating type )
+		)
+	),
+	New Script(
+		"Original Data Table",
+		New Table( "2x2x2 Factorial",
+			Add Rows( 8 ),
+			New Table Variable( "Design", "2x2x2 Factorial" ),
+			New Script(
+				"Model",
+				Fit Model(
+					Effects(
+						:Draw tension, :Germanium Concentration, :Coating type,
+						:Draw tension * :Germanium Concentration,
+						:Draw tension * :Coating type,
+						:Germanium Concentration * :Coating type
+					),
+					Y( :Signal attenuation ),
+					PERSONALITY( Standard Least Squares )
+				)
+			),
+			New Script(
+				"Evaluate Design",
+				DOE(
+					Evaluate Design,
+					X( :Draw tension, :Germanium Concentration, :Coating type )
+				)
+			),
+			New Script(
+				"DOE Dialog",
+				DOE(
+					Full Factorial Design,
+					{Add Response( Minimize, "Signal attenuation", ., ., . ),
+					Add Factor( Continuous, {0.5, 1}, "Draw tension", 0 ),
+					Add Factor(
+						Continuous,
+						{0.01, 0.05},
+						"Germanium Concentration",
+						0
+					), Add Factor( Categorical, {"1", "2"}, "Coating type", 0 ),
+					Set Random Seed( 1290763767 ), Make Design,
+					Simulate Responses( 0 ), Set Run Order( Randomize ), Make Table}
+				)
+			),
+			New Column( "Pattern",
+				Character,
+				"Nominal",
+				Set Values(
+					{"++1", "++2", "+−2", "−−1", "−+1", "−+2", "−−2", "+−1"}
+				)
+			),
+			New Column( "Draw tension",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {0.5, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values( [1, 1, 1, 0.5, 0.5, 0.5, 0.5, 1] )
+			),
+			New Column( "Germanium Concentration",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {0.01, 0.05} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values( [0.05, 0.05, 0.01, 0.01, 0.05, 0.05, 0.01, 0.01] )
+			),
+			New Column( "Coating type",
+				Character,
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values( {"1", "2", "2", "1", "1", "2", "2", "1"} )
+			),
+			New Column( "Signal attenuation",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property(
+					"Response Limits",
+					{Goal( Minimize ), Lower( . ), Upper( . ), Importance( . )}
+				),
+				Set Values( [., ., ., ., ., ., ., .] )
+			),
+			Set Label Columns( :Pattern )
+		)
+	),
+	New Script(
+		"DOE Dialog",
+		dt = Current Data Table();
+		dt2 = dt << run script( "Original Data Table" );
+		Current Data Table( dt2 );
+		DOE(
+			Augment Design,
+			X( :Draw tension, :Germanium Concentration, :Coating type ),
+			Y( :Signal attenuation ),
+			{Augment Method( Centerpoints, 10 ), Save X Matrix( 0 ),
+			Simulate Responses( 0 ), Make Table}
+		);
+	),
+	New Column( "Draw tension",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {0.5, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[1, 1, 1, 0.5, 0.5, 0.5, 0.5, 1, 0.75, 0.75, 0.75, 0.75, 0.75, 0.75,
+			0.75, 0.75, 0.75, 0.75]
+		)
+	),
+	New Column( "Germanium Concentration",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {0.01, 0.05} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[0.05, 0.05, 0.01, 0.01, 0.05, 0.05, 0.01, 0.01, 0.03, 0.03, 0.03, 0.03,
+			0.03, 0.03, 0.03, 0.03, 0.03, 0.03]
+		)
+	),
+	New Column( "Coating type",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"1", "2", "2", "1", "1", "2", "2", "1", "1", "2", "1", "2", "1", "2",
+			"1", "2", "1", "2"}
+		)
+	),
+	New Column( "Signal attenuation",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property(
+			"Response Limits",
+			{Goal( Minimize ), Lower( . ), Upper( . ), Importance( . )}
+		),
+		Set Selected,
+		Set Values(
+			[0.395945965, 0.619694465, 0.68045043, 0.395241887, 0.483801432,
+			0.466851339, 0.335342762, 0.458754485, 0.203649914, 0.321673277,
+			0.1659084, 0.302036261, 0.131307573, 0.29691068, 0.207079429,
+			0.319845849, 0.278185472, 0.328192748]
+		)
+	),
+	Set Row States( [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] )
+) << Run Formulas;
+Fit Model(
+	Y( :Signal attenuation ),
+	Effects(
+		:Draw tension, :Germanium Concentration, :Coating type,
+		:Draw tension * :Germanium Concentration, :Draw tension * :Coating type,
+		:Germanium Concentration * :Coating type
+	),
+	Personality( "Standard Least Squares" ),
+	Emphasis( "Effect Screening" ),
+	Run(
+		Profiler(
+			1,
+			Confidence Intervals( 1 ),
+			Desirability Functions( 1 ),
+			Term Value(
+				Draw tension( 0.75, Lock( 0 ), Show( 1 ) ),
+				Germanium Concentration( 0.03, Min( 0.01 ), Lock( 0 ), Show( 1 ) ),
+				Coating type( "1", Lock( 0 ), Show( 1 ) )
+			)
+		),
+		:Signal attenuation << {Summary of Fit( 0 ), Analysis of Variance( 0 ),
+		Parameter Estimates( 1 ), Sorted Estimates( 0 ),
+		Plot Actual by Predicted( 1 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 1 ), Plot Studentized Residuals( 1 ),
+		Plot Effect Leverage( 0 ), Plot Residual by Normal Quantiles( 0 ),
+		Box Cox Y Transformation( 0 )}
+	)
+);

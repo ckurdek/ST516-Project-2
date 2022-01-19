@@ -1,0 +1,404 @@
+﻿New Table( "Augmented Design",
+	Add Rows( 32 ),
+	New Table Variable( "Design", "Augmented Design" ),
+	New Script(
+		"Model",
+		Fit Model(
+			Effects(
+				:A, :B, :C, :D, :E, :F, :G, :H, :A * :C, :A * :D, :A * :E, :A * :F,
+				:A * :G, :A * :H
+			),
+			Y( :Y )
+		)
+	),
+	New Script(
+		"Evaluate Design",
+		DOE( Evaluate Design, X( :A, :B, :C, :D, :E, :F, :G, :H ) )
+	),
+	New Script(
+		"Original Data Table",
+		New Table( "Fractional Factorial",
+			Add Rows( 16 ),
+			New Table Variable( "Design", "Fractional Factorial" ),
+			New Script(
+				"Screening",
+				Fit Two Level Screening(
+					Y( :Y ),
+					X( :Block, :A, :B, :C, :D, :E, :F, :G, :H )
+				)
+			),
+			New Script(
+				"Model",
+				Fit Model(
+					Effects(
+						:A, :B, :C, :D, :E, :F, :G, :H, :Block, :A * :C, :A * :D,
+						:A * :E, :A * :F, :A * :G, :A * :H
+					),
+					Y( :Y ),
+					PERSONALITY( Standard Least Squares )
+				)
+			),
+			New Script(
+				"Evaluate Design",
+				DOE( Evaluate Design, X( :Block, :A, :B, :C, :D, :E, :F, :G, :H ) )
+			),
+			New Script(
+				"DOE Dialog",
+				DOE(
+					Screening Design,
+					{Add Response( Maximize, "Y", ., ., . ),
+					Add Factor( Continuous, -1, 1, "A", 0 ),
+					Add Factor( Continuous, -1, 1, "B", 0 ),
+					Add Factor( Continuous, -1, 1, "C", 0 ),
+					Add Factor( Continuous, -1, 1, "D", 0 ),
+					Add Factor( Categorical, {"-1", "1"}, "E", 0 ),
+					Add Factor( Categorical, {"-1", "1"}, "F", 0 ),
+					Add Factor( Categorical, {"-1", "1"}, "G", 0 ),
+					Add Factor( Categorical, {"-1", "1"}, "H", 0 ),
+					Set Random Seed( 1843705478 ), Make Design( 3 ),
+					Set Generators(
+						[0 1 1 1 1,
+						1 0 1 1 1,
+						1 1 1 0 0,
+						1 1 0 1 0,
+						1 1 1 1 2,
+						0 0 0 0 0]
+					), Simulate Responses( 0 ), Save X Matrix( 0 )}
+				)
+			),
+			New Column( "Pattern",
+				Character,
+				"Nominal",
+				Set Values(
+					{"−++−−+−+", "−+−−+−++", "+−++−+−−", "+−−−−+++", "+−+−+−−+",
+					"−+−+−++−", "+−−++−+−", "−++++−−−", "−−+−+++−", "++−+−−−+",
+					"+++−−−+−", "++−−++−−", "++++++++", "−−−−−−−−", "−−−+++−+",
+					"−−++−−++"}
+				),
+				Set Display Width( 79 )
+			),
+			New Column( "Block",
+				Character( 1 ),
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"1", "2"} )} ),
+				Set Property( "RunsPerBlock", 8 ),
+				Set Property( "Design Role", DesignRole( Blocking ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Selected,
+				Set Values(
+					{"1", "1", "1", "1", "1", "1", "1", "1", "2", "2", "2", "2", "2",
+					"2", "2", "2"}
+				),
+				Set Display Width( 47 )
+			),
+			New Column( "A",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {-1, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[-1, -1, 1, 1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, -1, -1]
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "B",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {-1, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[1, 1, -1, -1, -1, 1, -1, 1, -1, 1, 1, 1, 1, -1, -1, -1]
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "C",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {-1, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[1, -1, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1]
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "D",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {-1, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					[-1, -1, 1, -1, -1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1]
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "E",
+				Character( 2 ),
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"-1", "1", "-1", "-1", "1", "-1", "1", "1", "1", "-1", "-1",
+					"1", "1", "-1", "1", "-1"}
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "F",
+				Character( 2 ),
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"1", "-1", "1", "1", "-1", "1", "-1", "-1", "1", "-1", "-1",
+					"1", "1", "-1", "1", "-1"}
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "G",
+				Character( 2 ),
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"-1", "1", "-1", "1", "-1", "1", "1", "-1", "1", "-1", "1",
+					"-1", "1", "-1", "-1", "1"}
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "H",
+				Character( 2 ),
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values(
+					{"1", "1", "-1", "1", "1", "-1", "-1", "-1", "-1", "1", "-1",
+					"-1", "1", "-1", "1", "1"}
+				),
+				Set Display Width( 38 )
+			),
+			New Column( "Y",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property(
+					"Response Limits",
+					{Goal( Maximize ), Lower( . ), Upper( . ), Importance( . )}
+				),
+				Set Values(
+					[0.672664588, 0.297806029, 0.334549669, 0.302839027, 0.628774793,
+					0.553408626, 0.524011058, 0.349788234, 0.398968237, 0.475513141,
+					0.439729688, 0.407884247, 0.61994277, 0.342521204, 0.435847596,
+					0.629108535]
+				),
+				Set Display Width( 43 )
+			),
+			Set Label Columns( :Pattern )
+		)
+	),
+	New Script(
+		"DOE Dialog",
+		dt = Current Data Table();
+		dt2 = dt << run script( "Original Data Table" );
+		Current Data Table( dt2 );
+		DOE(
+			Augment Design,
+			X( :A, :B, :C, :D, :E, :F, :G, :H ),
+			Y( :Y ),
+			{Augment Method( Fold Over, [3] ), Save X Matrix( 0 ),
+			Simulate Responses( 0 ), Make Table}
+		);
+	),
+	New Column( "A",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {-1, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[-1, -1, 1, 1, 1, -1, 1, -1, -1, 1, 1, 1, 1, -1, -1, -1, -1, -1, 1, 1, 1,
+			-1, 1, -1, -1, 1, 1, 1, 1, -1, -1, -1]
+		)
+	),
+	New Column( "B",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {-1, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[1, 1, -1, -1, -1, 1, -1, 1, -1, 1, 1, 1, 1, -1, -1, -1, 1, 1, -1, -1,
+			-1, 1, -1, 1, -1, 1, 1, 1, 1, -1, -1, -1]
+		)
+	),
+	New Column( "C",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {-1, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Selected,
+		Set Values(
+			[1, -1, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1, -1, 1,
+			-1, 1, 1, -1, -1, 1, -1, 1, -1, 1, 1, -1]
+		)
+	),
+	New Column( "D",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {-1, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			[-1, -1, 1, -1, -1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1, -1, -1, 1, -1,
+			-1, 1, 1, 1, -1, 1, -1, -1, 1, -1, 1, 1]
+		)
+	),
+	New Column( "E",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"-1", "1", "-1", "-1", "1", "-1", "1", "1", "1", "-1", "-1", "1", "1",
+			"-1", "1", "-1", "-1", "1", "-1", "-1", "1", "-1", "1", "1", "1", "-1",
+			"-1", "1", "1", "-1", "1", "-1"}
+		)
+	),
+	New Column( "F",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"1", "-1", "1", "1", "-1", "1", "-1", "-1", "1", "-1", "-1", "1", "1",
+			"-1", "1", "-1", "1", "-1", "1", "1", "-1", "1", "-1", "-1", "1", "-1",
+			"-1", "1", "1", "-1", "1", "-1"}
+		)
+	),
+	New Column( "G",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"-1", "1", "-1", "1", "-1", "1", "1", "-1", "1", "-1", "1", "-1", "1",
+			"-1", "-1", "1", "-1", "1", "-1", "1", "-1", "1", "1", "-1", "1", "-1",
+			"1", "-1", "1", "-1", "-1", "1"}
+		)
+	),
+	New Column( "H",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"1", "1", "-1", "1", "1", "-1", "-1", "-1", "-1", "1", "-1", "-1", "1",
+			"-1", "1", "1", "1", "1", "-1", "1", "1", "-1", "-1", "-1", "-1", "1",
+			"-1", "-1", "1", "-1", "1", "1"}
+		)
+	),
+	New Column( "Y",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property(
+			"Response Limits",
+			{Goal( Maximize ), Lower( . ), Upper( . ), Importance( . )}
+		),
+		Set Values(
+			[0.672664588, 0.297806029, 0.334549669, 0.302839027, 0.628774793,
+			0.553408626, 0.524011058, 0.349788234, 0.398968237, 0.475513141,
+			0.439729688, 0.407884247, 0.61994277, 0.342521204, 0.435847596,
+			0.629108535, 0.308140395, 0.712234594, 0.496108492, 0.645523446,
+			0.262739027, 0.314885888, 0.368390687, 0.464536093, 0.293355368,
+			0.582315154, 0.365523229, 0.366588031, 0.43121089, 0.360224582,
+			0.622424424, 0.356821339]
+		)
+	),
+	Set Row States(
+		[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0]
+	)
+) << Run Formulas;
+Fit Model(
+	Y( :Y ),
+	Effects(
+		:A, :B, :C, :D, :E, :F, :G, :H, :A * :B, :A * :C, :A * :D, :A * :E, :A * :F,
+		:A * :G, :A * :H, :B * :C, :B * :D, :B * :E, :B * :F, :B * :G, :B * :H,
+		:C * :D, :C * :E, :C * :F, :C * :G, :C * :H, :D * :E, :D * :F, :D * :G,
+		:D * :H, :E * :F, :E * :G, :E * :H, :F * :G, :F * :H, :G * :H
+	),
+	Personality( "Standard Least Squares" ),
+	Emphasis( "Effect Screening" ),
+	Run(
+		Profiler(
+			1,
+			Confidence Intervals( 1 ),
+			Desirability Functions( 1 ),
+			Arrange in Rows( 5 ),
+			Term Value(
+				A( 0, Lock( 0 ), Show( 1 ) ),
+				B( 0, Lock( 0 ), Show( 1 ) ),
+				C( 0, Lock( 0 ), Show( 1 ) ),
+				D( 0, Lock( 0 ), Show( 1 ) ),
+				e( "-1", Lock( 0 ), Show( 1 ) ),
+				F( "-1", Lock( 0 ), Show( 1 ) ),
+				G( "-1", Lock( 0 ), Show( 1 ) ),
+				H( "-1", Lock( 0 ), Show( 1 ) )
+			)
+		),
+		:Y << {Summary of Fit( 0 ), Analysis of Variance( 0 ),
+		Parameter Estimates( 1 ), Lack of Fit( 0 ),
+		Normal Plot( 1, Half Normal Plot( 1 ) ), Sorted Estimates( 0 ),
+		Plot Actual by Predicted( 1 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 1 ), Plot Studentized Residuals( 1 ),
+		Plot Effect Leverage( 0 ), Plot Residual by Normal Quantiles( 0 ),
+		Box Cox Y Transformation( 0 )}
+	),
+	SendToReport(
+		Dispatch(
+			{"Response Y", "Effect Screening"},
+			"Parameter Estimate Population",
+			OutlineBox,
+			{Close( 0 )}
+		),
+		Dispatch(
+			{"Response Y", "Effect Screening", "Normal Plot"},
+			"1",
+			ScaleBox,
+			{Format( "Fixed Dec", 12, 1 ), Min( 0 ), Max( 3 ), Inc( 0.5 ),
+			Minor Ticks( 0 )}
+		),
+		Dispatch(
+			{"Response Y", "Effect Screening", "Normal Plot"},
+			"2",
+			ScaleBox,
+			{Min( 0 ), Max( 0.09 ), Inc( 0.02 ), Minor Ticks( 1 )}
+		),
+		Dispatch(
+			{"Response Y", "Effect Screening", "Normal Plot"},
+			"FitLS NormalEffectPlot",
+			FrameBox,
+			{Frame Size( 374, 280 )}
+		)
+	)
+);

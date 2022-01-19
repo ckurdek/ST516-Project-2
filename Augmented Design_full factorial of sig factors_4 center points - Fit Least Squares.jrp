@@ -1,0 +1,161 @@
+﻿New Table( "Augmented Design_full factorial of sig factors_4 center points",
+	Add Rows( 12 ),
+	New Table Variable( "Design", "Augmented Design" ),
+	New Script(
+		"Model",
+		Fit Model( Effects( :C, :D, :H, :C * :D, :C * :H, :D * :H ), Y( :Y ) )
+	),
+	New Script( "Evaluate Design", DOE( Evaluate Design, X( :C, :D, :H ) ) ),
+	New Script(
+		"Original Data Table",
+		New Table( "2x2x2 Factorial",
+			Add Rows( 8 ),
+			New Table Variable( "Design", "2x2x2 Factorial" ),
+			New Script(
+				"Model",
+				Fit Model(
+					Effects( :C, :D, :H, :C * :D, :C * :H, :D * :H ),
+					Y( :Y ),
+					PERSONALITY( Standard Least Squares )
+				)
+			),
+			New Script( "Evaluate Design", DOE( Evaluate Design, X( :C, :D, :H ) ) ),
+			New Script(
+				"DOE Dialog",
+				DOE(
+					Full Factorial Design,
+					{Add Response( Maximize, "Y", ., ., . ),
+					Add Factor( Continuous, {-1, 1}, "C", 0 ),
+					Add Factor( Continuous, {-1, 1}, "D", 0 ),
+					Add Factor( Categorical, {"-1", "1"}, "H", 0 ),
+					Set Random Seed( 324412951 ), Make Design,
+					Simulate Responses( 0 ), Set Run Order( Randomize ), Make Table}
+				)
+			),
+			New Column( "Pattern",
+				Character,
+				"Nominal",
+				Set Values(
+					{"++2", "+−1", "−+2", "−−1", "−+1", "−−2", "+−2", "++1"}
+				)
+			),
+			New Column( "C",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {-1, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values( [1, 1, -1, -1, -1, -1, 1, 1] )
+			),
+			New Column( "D",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property( "Coding", {-1, 1} ),
+				Set Property( "Design Role", DesignRole( Continuous ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values( [1, -1, 1, -1, 1, -1, -1, 1] )
+			),
+			New Column( "H",
+				Character,
+				"Nominal",
+				Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+				Set Property( "Design Role", DesignRole( Categorical ) ),
+				Set Property( "Factor Changes", Easy ),
+				Set Values( {"1", "-1", "1", "-1", "-1", "1", "1", "-1"} )
+			),
+			New Column( "Y",
+				Numeric,
+				"Continuous",
+				Format( "Best", 12 ),
+				Set Property(
+					"Response Limits",
+					{Goal( Maximize ), Lower( . ), Upper( . ), Importance( . )}
+				),
+				Set Values( [., ., ., ., ., ., ., .] )
+			),
+			Set Label Columns( :Pattern )
+		)
+	),
+	New Script(
+		"DOE Dialog",
+		dt = Current Data Table();
+		dt2 = dt << run script( "Original Data Table" );
+		Current Data Table( dt2 );
+		DOE(
+			Augment Design,
+			X( :C, :D, :H ),
+			Y( :Y ),
+			{Augment Method( Centerpoints, 4 ), Save X Matrix( 0 ),
+			Simulate Responses( 0 ), Make Table}
+		);
+	),
+	New Column( "C",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {-1, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values( [1, 1, -1, -1, -1, -1, 1, 1, 0, 0, 0, 0] )
+	),
+	New Column( "D",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property( "Coding", {-1, 1} ),
+		Set Property( "Design Role", DesignRole( Continuous ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values( [1, -1, 1, -1, 1, -1, -1, 1, 0, 0, 0, 0] )
+	),
+	New Column( "H",
+		Character,
+		"Nominal",
+		Set Property( "Value Order", {Custom Order( {"-1", "1"} )} ),
+		Set Property( "Design Role", DesignRole( Categorical ) ),
+		Set Property( "Factor Changes", Easy ),
+		Set Values(
+			{"1", "-1", "1", "-1", "-1", "1", "1", "-1", "-1", "1", "-1", "1"}
+		)
+	),
+	New Column( "Y",
+		Numeric,
+		"Continuous",
+		Format( "Best", 12 ),
+		Set Property(
+			"Response Limits",
+			{Goal( Maximize ), Lower( . ), Upper( . ), Importance( . )}
+		),
+		Set Values(
+			[0.619694465, 0.458754485, 0.466851339, 0.395241887, 0.483801432,
+			0.335342762, 0.68045043, 0.395945965, 0.203649914, 0.321673277,
+			0.1659084, 0.302036261]
+		),
+		Set Display Width( 77 )
+	)
+) << Run Formulas;
+Fit Model(
+	Y( :Y ),
+	Effects( :C, :D, :H, :C * :D, :C * :H, :D * :H ),
+	Personality( "Standard Least Squares" ),
+	Emphasis( "Effect Screening" ),
+	Run(
+		Profiler(
+			1,
+			Confidence Intervals( 1 ),
+			Desirability Functions( 1 ),
+			Term Value(
+				C( 0, Lock( 0 ), Show( 1 ) ),
+				D( 0, Lock( 0 ), Show( 1 ) ),
+				H( "-1", Lock( 0 ), Show( 1 ) )
+			)
+		),
+		:Y << {Summary of Fit( 0 ), Analysis of Variance( 0 ),
+		Parameter Estimates( 1 ), Sorted Estimates( 0 ),
+		Plot Actual by Predicted( 1 ), Plot Regression( 0 ),
+		Plot Residual by Predicted( 1 ), Plot Studentized Residuals( 1 ),
+		Plot Effect Leverage( 0 ), Plot Residual by Normal Quantiles( 0 ),
+		Box Cox Y Transformation( 0 )}
+	)
+);
