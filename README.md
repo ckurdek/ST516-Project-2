@@ -1,7 +1,7 @@
 # ST516-Project-2
 Optimizing Process Parameters Using Design of Experiments
 
-## Probelm Statement
+## Problem Statement
 
 You are working for a manufacturer of optical fiber and a new design is being
 introduced. One of the most important attributes of a fiber is optical signal attenuation,
